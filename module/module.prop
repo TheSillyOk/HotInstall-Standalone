@@ -1,0 +1,7 @@
+id=hot_install
+name=Hot Install
+version=v1
+versionCode=1
+author=TheSillyOk
+description=If we hot, why not install
+metamodule=true
