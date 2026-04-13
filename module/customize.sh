@@ -3,10 +3,12 @@
 
 MODDIR="/data/adb/modules/hot_install"
 
-busybox rm -rf "$MODDIR"
-mkdir -p "$MODDIR"
-busybox cp -Lrf "$MODPATH"/* "$MODDIR"
-(sleep 3 && busybox rm -rf "$MODPATH" && busybox rm "$MODDIR"/update) &
+(sleep 3;
+  busybox rm -rf "$MODDIR";
+  mkdir -p "$MODDIR";
+  busybox cp -Lrf "$MODPATH"/* "$MODDIR";
+  busybox rm -rf "$MODPATH";
+)&
 
 echo "- Self hot install performed!"
 echo "- Refresh module page after installation!"
