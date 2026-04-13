@@ -1,4 +1,3 @@
-
 # taken from ksu_toolkit
 MODDIR="/data/adb/modules/hot_install"
 
