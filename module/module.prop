@@ -1,7 +1,8 @@
 id=hot_install
-name=Hot Install
-version=v1
-versionCode=1
+name=Hot Install Standalone
+version=versionName
+versionCode=versionNumber
 author=TheSillyOk
 description=If we hot, why not install
+updateJson=https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/update.json
 metamodule=true

@@ -1,0 +1,64 @@
+name: Make release
+
+permissions:
+  contents: write
+
+on:
+  push:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+
+      - name: Get latest tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 || echo "v1")
+          latest_code=$(echo "${latest_tag}${{ github.run_number }}" | sed -E 's/[^0-9]//g')
+
+          echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
+          echo "latest_code=$latest_code" >> $GITHUB_ENV
+
+          zip_name="HotInstall-Standalone-${latest_tag}-${{ github.run_number }}"
+          echo "zip_name=$zip_name" >> $GITHUB_ENV
+
+      - name: Prepare module.prop for upload
+        run: |
+          sed -i 's/versionName/${{ env.latest_tag }} (${{ github.run_number }})/' module/module.prop
+          sed -i 's/versionNumber/${{ env.latest_code }}/' module/module.prop
+
+      - name: Upload CI artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.zip_name }}
+          path: "module/*"
+
+      - name: Prepare remote
+        env:
+         GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf ".git"
+          cd module/
+          zip -r9 "../${{ env.zip_name }}.zip" .
+          cd -
+
+          git clone "https://github.com/${{ github.repository }}" --depth=1 -b "remote" remote
+          rm -rf remote/*.zip || true
+          mv "${{ env.zip_name }}.zip" remote/
+
+          cd remote/
+          sed -Ei 's/"version": ".*?"/"version": "${{ env.latest_tag }} (${{ github.run_number }})"/' update.json
+          sed -Ei 's/"versionCode": .*?,/"versionCode": ${{ env.latest_code }},/' update.json
+          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/raw.githubusercontent.com\/TheSillyOk\/HotInstall-Standalone\/refs\/heads\/remote\/${{ env.zip_name }}.zip"/' update.json
+
+          gh auth setup-git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "CI ${{ github.run_number }}"
+          git push origin remote
