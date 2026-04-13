@@ -1,5 +1,6 @@
 {
   "version": "v1 (1)",
   "versionCode": 11,
-  "zipUrl": "https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/HotInstall-Standalone-v1-1.zip"
+  "zipUrl": "https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/HotInstall-Standalone-v1-1.zip",
+  "changelog": "https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/changelog.md"
 }
