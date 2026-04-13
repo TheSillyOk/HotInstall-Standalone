@@ -1,7 +1,5 @@
 # taken from mountify
-
-mountify_hot_install() {
-
+hot_install() {
 	if [ -z "$MODID" ]; then
 		return
 	fi
@@ -9,12 +7,12 @@ mountify_hot_install() {
 	MODDIR_INTERNAL="/data/adb/modules/$MODID"
 	MODPATH_INTERNAL="/data/adb/modules_update/$MODID"
 
-	if [ ! -d "$MODDIR_INTERNAL" ] || [ ! -d "$MODPATH_INTERNAL" ]; then
+	if [ ! -d "$MODPATH_INTERNAL" ]; then
 		return
 	fi
 
 	# hot install
-	busybox rm -rf "$MODDIR_INTERNAL"
+	busybox rm -rf "$MODDIR_INTERNAL" || true
 	busybox mv "$MODPATH_INTERNAL" "$MODDIR_INTERNAL"
 
 	# run script requested, blocking, just fork it yourselves if you want it on background
@@ -26,8 +24,8 @@ mountify_hot_install() {
 	mkdir -p "$MODPATH_INTERNAL"
 	cat "$MODDIR_INTERNAL/module.prop" > "$MODPATH_INTERNAL/module.prop"
 
-	( sleep 3 ; 
-		rm -rf "$MODDIR_INTERNAL/update" ; 
+	( sleep 3 ;
+		rm "$MODDIR_INTERNAL/update" ;
 		rm -rf "$MODPATH_INTERNAL"
 	) & # fork in background
 
@@ -36,6 +34,10 @@ mountify_hot_install() {
 	echo "- No need to reboot!"
 }
 
+export HAS_HOT_INSTALL="true"
+export MOUNTIFY_HAS_HOT_INSTALL="true" # since ksu_toolkit checks this
+
+install_module
 if [ "$MODULE_HOT_INSTALL_REQUEST" = true ]; then
-	mountify_hot_install
+	hot_install
 fi
