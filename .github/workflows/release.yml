@@ -5,6 +5,8 @@ permissions:
 
 on:
   push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   release:
@@ -39,6 +41,7 @@ jobs:
           path: "module/*"
 
       - name: Prepare remote
+        if: github.event_name != 'pull_request'
         env:
          GH_TOKEN: ${{ github.token }}
         run: |
@@ -62,3 +65,11 @@ jobs:
           git add .
           git commit -m "CI ${{ github.run_number }}"
           git push origin remote
+
+      - name: Upload module to release
+        if: github.event_name != 'pull_request' && github.ref_type == 'tag'
+        env:
+         GH_TOKEN: ${{ github.token }}
+        run: |
+          cd remote/
+          gh release upload "${{ github.ref_name }}" "${{ env.zip_name }}.zip"
