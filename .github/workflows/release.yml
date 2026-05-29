@@ -18,41 +18,24 @@ jobs:
           submodules: "recursive"
           fetch-depth: 0
 
-      - name: Get latest tag
+      - name: Prepare Module ZIP
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 || echo "v1")
-          latest_code=$(echo "${latest_tag}${{ github.run_number }}" | sed -E 's/[^0-9]//g')
-
-          echo "latest_tag=${latest_tag}" >> $GITHUB_ENV
-          echo "latest_code=$latest_code" >> $GITHUB_ENV
-
-          zip_name="HotInstall-Standalone-${latest_tag}-${{ github.run_number }}"
-          echo "zip_name=$zip_name" >> $GITHUB_ENV
-
-      - name: Prepare module.prop for upload
-        run: |
-          sed -i 's/versionName/${{ env.latest_tag }} (${{ github.run_number }})/' module/module.prop
-          sed -i 's/versionNumber/${{ env.latest_code }}/' module/module.prop
+          make
 
       - name: Upload CI artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.zip_name }}
-          path: "module/*"
+          path: "out/*.zip"
+          archive: false
 
       - name: Prepare remote
         if: github.event_name != 'pull_request'
         env:
          GH_TOKEN: ${{ github.token }}
         run: |
-          rm -rf ".git"
-          cd module/
-          zip -r9 "../${{ env.zip_name }}.zip" .
-          cd -
-
           git clone "https://github.com/${{ github.repository }}" --depth=1 -b "remote" remote
           rm -rf remote/*.zip || true
-          mv "${{ env.zip_name }}.zip" remote/
+          mv "out/*.zip" remote/
 
           cd remote/
           sed -Ei 's/"version": ".*?"/"version": "${{ env.latest_tag }} (${{ github.run_number }})"/' update.json
@@ -81,11 +64,11 @@ jobs:
         run: |
           cd module/
           sed -Ei 's/(updateJson=).*json/\1https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/releases\/latest\/download\/update.json/' module.prop
-          zip -r9 "../remote/${{ env.zip_name }}.zip" .
-          cd -
+          cd ..
+          make
 
           cd remote/
-          gh release upload "${{ github.ref_name }}" "${{ env.zip_name }}.zip"
+          gh release upload "${{ github.ref_name }}" "../out/*.zip"
           sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/raw\/${{ env.latest_remote }}\/${{ env.zip_name }}.zip"/' update.json
           sed -Ei 's/"changelog": ".*?"/"changelog": "https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/raw\/${{ env.latest_remote }}\/changelog.md"/' update.json
           gh release upload "${{ github.ref_name }}" "update.json"
