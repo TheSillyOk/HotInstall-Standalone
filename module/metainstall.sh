@@ -16,8 +16,10 @@ hot_install() {
   busybox mv "$MODPATH_INTERNAL" "$MODDIR_INTERNAL"
 
   # run script requested, blocking, just fork it yourselves if you want it on background
-  if [ ! -z "$MODULE_HOT_RUN_SCRIPT" ]; then
-    [ -f "$MODDIR_INTERNAL/$MODULE_HOT_RUN_SCRIPT" ] && sh "$MODDIR_INTERNAL/$MODULE_HOT_RUN_SCRIPT"
+  if [ ! -z "$MODULE_HOT_RUN_SCRIPT" ] &&
+     [ -f "$MODDIR_INTERNAL/$MODULE_HOT_RUN_SCRIPT" ]; then
+     chmod +x "$MODDIR_INTERNAL/$MODULE_HOT_RUN_SCRIPT"
+     . "$MODDIR_INTERNAL/$MODULE_HOT_RUN_SCRIPT"
   fi
 
   # we do this dance to satisfy kernelsu's ensure_file_exists
