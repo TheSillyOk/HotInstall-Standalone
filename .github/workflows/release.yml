@@ -35,12 +35,16 @@ jobs:
         run: |
           git clone "https://github.com/${{ github.repository }}" --depth=1 -b "remote" remote
           rm -rf remote/*.zip || true
-          mv "out/*.zip" remote/
+          make MODULE_ZIP="HotInstall-Standalone"
+          mv "out/HotInstall-Standalone.zip" remote/
+
+          latest_tag=$(git describe --tags --abbrev=0 || echo "v1")
+          latest_code=$(git rev-list HEAD --count 2>/dev/null || echo 1)
 
           cd remote/
-          sed -Ei 's/"version": ".*?"/"version": "${{ env.latest_tag }} (${{ github.run_number }})"/' update.json
-          sed -Ei 's/"versionCode": .*?,/"versionCode": ${{ env.latest_code }},/' update.json
-          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/raw.githubusercontent.com\/TheSillyOk\/HotInstall-Standalone\/refs\/heads\/remote\/${{ env.zip_name }}.zip"/' update.json
+          sed -Ei "s/\"version\": \".*?\"/\"version\": \"${latest_tag} (${latest_code})\"/" update.json
+          sed -Ei "s/\"versionCode\": .*?,/\"versionCode\": ${latest_code},/" update.json
+          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/raw.githubusercontent.com\/TheSillyOk\/HotInstall-Standalone\/refs\/heads\/remote\/HotInstall-Standalone.zip"/' update.json
 
           gh auth setup-git
           git config --global user.name "github-actions[bot]"
@@ -65,10 +69,10 @@ jobs:
           cd module/
           sed -Ei 's/(updateJson=).*json/\1https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/releases\/latest\/download\/update.json/' module.prop
           cd ..
-          make
+          make clean && make
 
           cd remote/
           gh release upload "${{ github.ref_name }}" "../out/*.zip"
-          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/raw\/${{ env.latest_remote }}\/${{ env.zip_name }}.zip"/' update.json
+          sed -Ei 's/"zipUrl": ".*?"/"zipUrl": "https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/raw\/${{ env.latest_remote }}\/HotInstall-Standalone.zip"/' update.json
           sed -Ei 's/"changelog": ".*?"/"changelog": "https:\/\/github.com\/TheSillyOk\/HotInstall-Standalone\/raw\/${{ env.latest_remote }}\/changelog.md"/' update.json
           gh release upload "${{ github.ref_name }}" "update.json"
