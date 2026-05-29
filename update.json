@@ -1,6 +1,6 @@
 {
-  "version": " (29)",
-  "versionCode": ,
+  "version": "${latest_tag} (30)",
+  "versionCode": ${latest_code},
   "zipUrl": "https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/HotInstall-Standalone.zip",
   "changelog": "https://raw.githubusercontent.com/TheSillyOk/HotInstall-Standalone/refs/heads/remote/changelog.md"
 }
