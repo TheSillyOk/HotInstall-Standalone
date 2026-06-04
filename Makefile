@@ -28,7 +28,7 @@ build:
 	@cp -r module/* $(BUILD_DIR)/
 
 	@sed -e 's/versionName/$(VER_NAME) ($(VERSION))/g' \
-             -e 's/versionCode/$(VER_CODE)/g' \
+             -e 's/versionNumber/$(VER_CODE)/g' \
              module/module.prop > $(BUILD_DIR)/module.prop
 
 	@echo Creating module zip...
