@@ -38,7 +38,7 @@ jobs:
           make MODULE_ZIP="HotInstall-Standalone"
           mv "out/HotInstall-Standalone.zip" remote/
 
-          latest_tag=$(git describe --tags --abbrev=0 || echo "v1")
+          latest_tag=$(git describe --tags --abbrev=0 || echo "v1.0.2")
           latest_code=$(git rev-list HEAD --count 2>/dev/null || echo 1)
 
           cd remote/
