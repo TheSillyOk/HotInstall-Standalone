@@ -1,3 +1,5 @@
+# ksu's hot install is not meant for metamodules
+
 # taken from ksu_toolkit
 MODDIR="/data/adb/modules/hot_install"
 

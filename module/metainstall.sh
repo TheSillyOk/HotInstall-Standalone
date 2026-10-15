@@ -40,6 +40,7 @@ export HAS_HOT_INSTALL="true"
 export MOUNTIFY_HAS_HOT_INSTALL="true" # since ksu_toolkit checks this
 
 install_module
-if [ "$MODULE_HOT_INSTALL_REQUEST" = true ]; then
+if [ "$MODULE_HOT_INSTALL_REQUEST" = "true" ] &&
+   [ -z "$KSU_HAS_HOT_INSTALL" ]; then
   hot_install
 fi
